@@ -14,7 +14,12 @@ class CurrentTemperatureTableViewCell: UITableViewCell {
 let cityTemp: UILabel = {
     let temp = UILabel()
     temp.translatesAutoresizingMaskIntoConstraints = false
-    temp.font = UIFont.init(name: "Quicksand-Regular", size: 20)
+    temp.font = UIFont.init(name: "Quicksand-Bold", size: 40)
+    temp.layer.shadowColor = UIColor.black.cgColor
+    temp.layer.shadowRadius = 3.0
+    temp.layer.shadowOpacity = 1.0
+    temp.layer.shadowOffset = CGSize(width: 4, height: 4)
+    temp.layer.masksToBounds = false
     return temp
 }()
 
@@ -32,17 +37,20 @@ let cityTemp: UILabel = {
     func setupUI(){
         contentView.addSubview(cityTemp)
         setupConstraints()
+        contentView.backgroundColor = .init(red: 0.36, green: 0.64, blue: 0.77, alpha: 1.00)
+
     }
-    
+
     func configure(temperature: Double){
-        cityTemp.text = "\(temperature)"
+        let temperature = (temperature - 273.15).rounded()
+        cityTemp.text = "\(temperature)° C"
     }
     
     func setupConstraints(){
         cityTemp.snp.makeConstraints{(maker) in
-            maker.top.equalToSuperview().inset(15)
-            maker.leading.equalToSuperview().inset(15)
-            maker.trailing.equalToSuperview().inset(12)
+            maker.top.bottom.equalToSuperview()
+            maker.centerX.equalToSuperview()
+            maker.height.equalTo(100)
         }
     }
 }

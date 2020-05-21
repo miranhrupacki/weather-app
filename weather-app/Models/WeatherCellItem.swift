@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct MovieCellItem{
+struct WeatherCellItem{
     let type: WeatherDataTypeEnum
     let data: Any
 }

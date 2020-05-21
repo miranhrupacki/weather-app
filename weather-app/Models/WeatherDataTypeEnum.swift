@@ -7,3 +7,11 @@
 //
 
 import Foundation
+
+enum WeatherDataTypeEnum {
+    case temperature
+    case description
+    case image
+    case name
+    case humidity
+}

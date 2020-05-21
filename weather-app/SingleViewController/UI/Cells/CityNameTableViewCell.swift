@@ -16,6 +16,7 @@ class CityNameTableViewCell: UITableViewCell {
         city.numberOfLines = 0
         city.adjustsFontSizeToFitWidth = true
         city.textColor = .black
+        city.font = UIFont.init(name: "Quicksand-Bold", size: 20)
         return city
     }()
     
@@ -33,6 +34,7 @@ class CityNameTableViewCell: UITableViewCell {
     func setupUI(){
         contentView.addSubview(cityLabel)
         setupConstraints()
+        contentView.backgroundColor = .init(red: 0.36, green: 0.64, blue: 0.77, alpha: 1.00)
     }
     
     func configure(name: String){
@@ -41,9 +43,9 @@ class CityNameTableViewCell: UITableViewCell {
     
     func setupConstraints(){
         cityLabel.snp.makeConstraints{(maker) in
-            maker.top.equalToSuperview().inset(15)
-            maker.leading.equalToSuperview().inset(15)
-            maker.trailing.equalToSuperview().inset(12)
+            maker.top.bottom.equalToSuperview()
+            maker.centerX.equalToSuperview()
+            maker.height.equalTo(100)
         }
     }
 }

@@ -7,3 +7,7 @@
 //
 
 import Foundation
+
+public struct Response<T: Codable>: Codable {
+    let results: T?
+}

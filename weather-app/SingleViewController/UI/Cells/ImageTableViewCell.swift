@@ -9,7 +9,7 @@
 import UIKit
 
 class ImageTableViewCell: UITableViewCell {
-
+    
     let weatherImageView: UIImageView = {
         let weatherImage = UIImageView()
         weatherImage.translatesAutoresizingMaskIntoConstraints = false
@@ -18,4 +18,33 @@ class ImageTableViewCell: UITableViewCell {
         weatherImage.layer.maskedCorners = [.layerMaxXMaxYCorner, . layerMinXMaxYCorner]
         return weatherImage
     }()
+    
+    internal var id: Int = 0
+    
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?){
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        setupUI()
+    }
+    
+    required init?(coder: NSCoder){
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    func setupUI(){
+        contentView.addSubview(weatherImageView)
+        contentView.backgroundColor = .init(red: 0.36, green: 0.64, blue: 0.77, alpha: 1.00)
+        setupConstraints()
+    }
+    
+    func configure(image: String, weather: WeatherCellItem){
+        weatherImageView.image = UIImage(named: image)
+    }
+    
+    func setupConstraints(){
+        weatherImageView.snp.makeConstraints{(maker) in
+            maker.top.bottom.equalToSuperview()
+            maker.centerX.equalToSuperview()
+        }
+    }
 }
+
