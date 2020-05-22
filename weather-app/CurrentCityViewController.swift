@@ -1,5 +1,5 @@
 //
-//  ViewController.swift
+//  CurrentCityViewController.swift
 //  weather-app
 //
 //  Created by Miran Hrupački on 19/05/2020.
@@ -11,7 +11,7 @@ import SnapKit
 import RxSwift
 import RxCocoa
 
-class ViewController: UIViewController{
+class CurrentCityViewController: UIViewController{
     
     var tableView: UITableView = {
         let tableView = UITableView()
@@ -22,77 +22,68 @@ class ViewController: UIViewController{
     
     let disposeBag = DisposeBag()
     let loaderIndicator = UIActivityIndicatorView(style: UIActivityIndicatorView.Style.large)
-    var dataSource = [WeatherView]()
-    var screenData = [WeatherCellItem]()
-    private let networkManager: NetworkManager
-    let weatherReplaySubject = ReplaySubject<()>.create(bufferSize: 1)
+    
+    let viewModel: CurrentCityViewModel = {
+        let viewModel = CurrentCityViewModelImpl(networkManager: NetworkManager())
+        return viewModel
+    }()
+    
     var lat = 45.7621
     var lon = 18.1651
-                
-    struct Cells{
-        static let weatherCell = "WeatherTableViewCell"
-    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         setupUI()
-        setupSubscriptions()
-        weatherReplaySubject.onNext(())
+        viewModel.loadData()
+        viewModel.initializeLoadDataSubject().disposed(by: disposeBag)
+        inizializeDataStatusObservable().disposed(by: disposeBag)
+        initializeAlertObservable().disposed(by: disposeBag)
+        initializeLoaderObservable().disposed(by: disposeBag)
     }
-
+    
     func setupUI(){
         configureTableView()
         setupConstraints()
     }
     
-    init(networkManager: NetworkManager){
-        self.networkManager = networkManager
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    func setupSubscriptions() {
-        showData(for: weatherReplaySubject).disposed(by: disposeBag)
-    }
-    
-    func showData(for subject: ReplaySubject<()>) -> Disposable {
-        return subject
-            .flatMap { [unowned self] (_) -> Observable<WeatherResponse> in
-                DispatchQueue.main.async {
-                    self.loaderIndicator.startAnimating()
-                }
-                return self.networkManager.getData(url: "https://api.openweathermap.org/data/2.5/weather?lat=\(self.lat)&lon=\(self.lon)")
-        }
-        .map{ [unowned self] in
-            return self.createScreenData(weather: $0)
-        }
-        .subscribeOn(ConcurrentDispatchQueueScheduler(qos: .background))
-        .observeOn(MainScheduler.instance)
-        .subscribe(
-            onNext: { [unowned self](weatherList) in
-                self.screenData = weatherList
-                DispatchQueue.main.async {
-                    self.loaderIndicator.stopAnimating()
-                    self.tableView.reloadData()
-                }
-            }, onError: { [unowned self]error in
+    private func initializeAlertObservable() -> Disposable{
+        viewModel.alertObservable
+            .observeOn(MainScheduler.instance)
+            .subscribeOn(ConcurrentDispatchQueueScheduler(qos: .background))
+            .subscribe(onNext: { [unowned self] type in
                 self.showAlertWith(title: "Weather network error", message: "Weather couldn't load")
-        })
+                }
+            )
     }
     
-    func createScreenData(weather: WeatherResponse)  -> [WeatherCellItem] {
-        var screenData: [WeatherCellItem] = []
-        screenData.append(WeatherCellItem(type: .image, data: weather.weather[0].icon))
-        screenData.append(WeatherCellItem(type: .temperature, data: weather.main.temp))
-        screenData.append(WeatherCellItem(type: .humidity, data: weather.main.humidity))
-        screenData.append(WeatherCellItem(type: .description, data: weather.weather[0].description))
-        screenData.append(WeatherCellItem(type: .name, data: weather.name ?? ""))
-
-        return screenData
+    private func initializeLoaderObservable() -> Disposable{
+        viewModel.loaderSubject
+            .observeOn(MainScheduler.instance)
+            .subscribeOn(ConcurrentDispatchQueueScheduler(qos: .background))
+            .subscribe(onNext:{ [unowned self] status in
+                self.checkLoaderStatus(status: status)
+            })
+    }
+    
+    private func checkLoaderStatus(status: Bool){
+        if status{
+            self.loaderIndicator.startAnimating()
+        }
+        else{
+            self.loaderIndicator.stopAnimating()
+        }
+    }
+    
+    func inizializeDataStatusObservable() -> Disposable {
+        viewModel.weatherDataStatusObservable
+            .subscribeOn(ConcurrentDispatchQueueScheduler(qos: .background))
+            .observeOn(MainScheduler.instance)
+            .subscribe(onNext: { [unowned self] (status) in
+                if status {
+                    self.tableView.reloadData()
+                } 
+            })
     }
     
     func configureTableView() {
@@ -122,15 +113,15 @@ class ViewController: UIViewController{
     }
 }
 
-extension ViewController: UITableViewDelegate, UITableViewDataSource {
+extension CurrentCityViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return screenData.count
+        return viewModel.screenData.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let item = screenData[indexPath.row]
+        let item = viewModel.screenData[indexPath.row]
         
         switch item.type {
             
@@ -170,7 +161,7 @@ extension ViewController: UITableViewDelegate, UITableViewDataSource {
             
             return cell
             
-            case .humidity:
+        case .humidity:
             guard let safeData = item.data as? Int else {return UITableViewCell()}
             guard let cell = tableView.dequeueReusableCell(withIdentifier: "HumidityCell", for: indexPath) as?
                 HumidityTableViewCell else {

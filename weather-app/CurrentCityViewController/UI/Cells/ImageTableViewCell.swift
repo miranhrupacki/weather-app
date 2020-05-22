@@ -15,7 +15,6 @@ class ImageTableViewCell: UITableViewCell {
         weatherImage.translatesAutoresizingMaskIntoConstraints = false
         weatherImage.clipsToBounds = true
         weatherImage.layer.cornerRadius = 20
-        weatherImage.layer.maskedCorners = [.layerMaxXMaxYCorner, . layerMinXMaxYCorner]
         return weatherImage
     }()
     
