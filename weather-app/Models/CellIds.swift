@@ -9,5 +9,6 @@
 import Foundation
 
 struct Cells{
-     static let weatherCell = "WeatherTableViewCell"
- }
+    static let weatherCell = "WeatherTableViewCell"
+    static let hourlyCell = "HourlyTableViewCell"
+}

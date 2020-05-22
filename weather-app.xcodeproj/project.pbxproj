@@ -38,6 +38,8 @@
 		F1E7929E2478259F000EE686 /* CurrentCityViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1E7929D2478259F000EE686 /* CurrentCityViewModel.swift */; };
 		F1E792A0247826DB000EE686 /* CurrentCityViewModelImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1E7929F247826DB000EE686 /* CurrentCityViewModelImpl.swift */; };
 		F1E792A224783B99000EE686 /* CellIds.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1E792A124783B99000EE686 /* CellIds.swift */; };
+		F1E792A524783C67000EE686 /* HourlyViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1E792A424783C67000EE686 /* HourlyViewModel.swift */; };
+		F1E792A724783C75000EE686 /* HourlyViewModelImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1E792A624783C75000EE686 /* HourlyViewModelImpl.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -75,6 +77,8 @@
 		F1E7929D2478259F000EE686 /* CurrentCityViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentCityViewModel.swift; sourceTree = "<group>"; };
 		F1E7929F247826DB000EE686 /* CurrentCityViewModelImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentCityViewModelImpl.swift; sourceTree = "<group>"; };
 		F1E792A124783B99000EE686 /* CellIds.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CellIds.swift; sourceTree = "<group>"; };
+		F1E792A424783C67000EE686 /* HourlyViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HourlyViewModel.swift; sourceTree = "<group>"; };
+		F1E792A624783C75000EE686 /* HourlyViewModelImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HourlyViewModelImpl.swift; sourceTree = "<group>"; };
 		FD716D31F7C85BBA16F96EDD /* Pods-weather-app.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-weather-app.debug.xcconfig"; path = "Target Support Files/Pods-weather-app/Pods-weather-app.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -110,6 +114,7 @@
 		F10B08972476960400E53EED /* HourlyViewController */ = {
 			isa = PBXGroup;
 			children = (
+				F1E792A324783C51000EE686 /* ViewModel */,
 				F10B08982476961400E53EED /* UI */,
 				F10B089C2476963E00E53EED /* HourlyViewController.swift */,
 			);
@@ -307,6 +312,15 @@
 			path = ViewModel;
 			sourceTree = "<group>";
 		};
+		F1E792A324783C51000EE686 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				F1E792A424783C67000EE686 /* HourlyViewModel.swift */,
+				F1E792A624783C75000EE686 /* HourlyViewModelImpl.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -433,6 +447,7 @@
 				F18ED38C2473F1F2008736B8 /* WeatherView.swift in Sources */,
 				F18ED3932473F368008736B8 /* SerializationManager.swift in Sources */,
 				F10B089B2476962F00E53EED /* HourlyTableViewCell.swift in Sources */,
+				F1E792A524783C67000EE686 /* HourlyViewModel.swift in Sources */,
 				F10B90262475796E00292BED /* HumidityTableViewCell.swift in Sources */,
 				F18ED39C24740600008736B8 /* CurrentTemperatureTableViewCell.swift in Sources */,
 				F1E792A0247826DB000EE686 /* CurrentCityViewModelImpl.swift in Sources */,
@@ -448,6 +463,7 @@
 				F18ED39E24740616008736B8 /* ImageTableViewCell.swift in Sources */,
 				F10B089D2476963E00E53EED /* HourlyViewController.swift in Sources */,
 				F18ED38A2473F084008736B8 /* WeatherResponse.swift in Sources */,
+				F1E792A724783C75000EE686 /* HourlyViewModelImpl.swift in Sources */,
 				F18ED36D2473EF2C008736B8 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -20,9 +20,6 @@ class CurrentCityViewController: UIViewController{
         return tableView
     }()
     
-    let disposeBag = DisposeBag()
-    let loaderIndicator = UIActivityIndicatorView(style: UIActivityIndicatorView.Style.large)
-    
     let viewModel: CurrentCityViewModel = {
         let viewModel = CurrentCityViewModelImpl(networkManager: NetworkManager())
         return viewModel
@@ -30,6 +27,8 @@ class CurrentCityViewController: UIViewController{
     
     var lat = 45.7621
     var lon = 18.1651
+    let disposeBag = DisposeBag()
+    let loaderIndicator = UIActivityIndicatorView(style: UIActivityIndicatorView.Style.large)
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -54,7 +53,7 @@ class CurrentCityViewController: UIViewController{
             .subscribe(onNext: { [unowned self] type in
                 self.showAlertWith(title: "Weather network error", message: "Weather couldn't load")
                 }
-            )
+        )
     }
     
     private func initializeLoaderObservable() -> Disposable{

@@ -11,15 +11,15 @@ import RxSwift
 
 class CurrentCityViewModelImpl: CurrentCityViewModel {
     
-    private var networkManager: NetworkManager
     var lat = 45.7621
     var lon = 18.1651
-    var weatherDataStatusObservable = ReplaySubject<(Bool)>.create(bufferSize: 1)
+    private var networkManager: NetworkManager
     var screenData = [WeatherCellItem]()
+    
+    var weatherDataStatusObservable = ReplaySubject<(Bool)>.create(bufferSize: 1)
     var weatherReplaySubject = ReplaySubject<()>.create(bufferSize: 1)
     let loaderSubject = ReplaySubject<Bool>.create(bufferSize: 1)
     let alertObservable = ReplaySubject<()>.create(bufferSize: 1)
-    
     
     init(networkManager: NetworkManager) {
         self.networkManager = networkManager

@@ -78,7 +78,7 @@ class MainViewController: UIViewController {
     }
     
     @objc func pushToHourlyWeatherView() {
-         let vc = HourlyViewController(networkManager: NetworkManager())
+         let vc = HourlyViewController()
          self.navigationController?.pushViewController(vc, animated: true)
      }
     
