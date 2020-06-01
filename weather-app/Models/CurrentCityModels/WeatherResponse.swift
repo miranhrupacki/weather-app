@@ -12,10 +12,8 @@ public struct WeatherResponse: Codable {
     let coord: Coordinates
     let main: CurrentWeather
     let weather: [Weather]
-    let wind: Wind
-    let sys: Sun
     let id: Int
-    let name: String?
+    var name: String?
 }
 
 public struct Coordinates: Codable {
@@ -32,17 +30,10 @@ public struct Weather: Codable {
 public struct CurrentWeather: Codable {
     let temp: Double
     let humidity: Int
-    let tempMin: Double
-    let tempMax: Double
 }
 
-public struct Wind: Codable {
-    let speed: Double
-    let deg: Int?
-}
-
-public struct Sun: Codable {
-    let country: String
-    let sunrise: Int
-    let sunset: Int
+extension WeatherResponse: Equatable {
+    public static func == (lhs: WeatherResponse, rhs: WeatherResponse) -> Bool {
+        lhs.name == rhs.name
+    }
 }

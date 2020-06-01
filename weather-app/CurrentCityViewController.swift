@@ -20,13 +20,7 @@ class CurrentCityViewController: UIViewController{
         return tableView
     }()
     
-    let viewModel: CurrentCityViewModel = {
-        let viewModel = CurrentCityViewModelImpl(networkManager: NetworkManager())
-        return viewModel
-    }()
-    
-    var lat = 45.7621
-    var lon = 18.1651
+    let viewModel: CurrentCityViewModel
     let disposeBag = DisposeBag()
     let loaderIndicator = UIActivityIndicatorView(style: UIActivityIndicatorView.Style.large)
     
@@ -41,11 +35,15 @@ class CurrentCityViewController: UIViewController{
         initializeLoaderObservable().disposed(by: disposeBag)
     }
     
-    func setupUI(){
-        configureTableView()
-        setupConstraints()
+    init(weatherResponse: WeatherResponse) {
+        viewModel = CurrentCityViewModelImpl(networkManager: NetworkManager(), weatherResponse: weatherResponse)
+        super.init(nibName: nil, bundle: nil)
     }
     
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
     private func initializeAlertObservable() -> Disposable{
         viewModel.alertObservable
             .observeOn(MainScheduler.instance)
@@ -84,90 +82,49 @@ class CurrentCityViewController: UIViewController{
                 } 
             })
     }
-    
-    func configureTableView() {
-        view.addSubview(tableView)
-        setTableViewDelegates()
-        tableView.estimatedRowHeight = 180
-        tableView.rowHeight = UITableView.automaticDimension
-        tableView.separatorStyle = .none
         
-        tableView.register(CurrentTemperatureTableViewCell.self, forCellReuseIdentifier: "CurrentTemperatureCell")
-        tableView.register(CityNameTableViewCell.self, forCellReuseIdentifier: "CityNameCell")
-        tableView.register(DescriptionTableViewCell.self, forCellReuseIdentifier: "DescriptionCell")
-        tableView.register(ImageTableViewCell.self, forCellReuseIdentifier: "ImageCell")
-        tableView.register(HumidityTableViewCell.self, forCellReuseIdentifier: "HumidityCell")
-    }
-    
-    func setupConstraints(){
+        func setupUI() {
+            configureTableView()
+            setupConstraints()
+        }
         
-        tableView.snp.makeConstraints { (maker) in
-            maker.edges.equalTo(view.safeAreaLayoutGuide)
+        func configureTableView() {
+            view.addSubview(tableView)
+            setTableViewDelegates()
+            tableView.estimatedRowHeight = 180
+            tableView.rowHeight = UITableView.automaticDimension
+            tableView.register(SearchCityTableViewCell.self, forCellReuseIdentifier: Cells.cityCell)
+        }
+        
+        func setupConstraints(){
+            tableView.snp.makeConstraints { (maker) in
+                maker.bottom.trailing.leading.top.equalToSuperview()
+            }
+        }
+        
+        func setTableViewDelegates() {
+            tableView.delegate = self
+            tableView.dataSource = self
         }
     }
-    
-    func setTableViewDelegates() {
-        tableView.delegate = self
-        tableView.dataSource = self
-    }
-}
 
-extension CurrentCityViewController: UITableViewDelegate, UITableViewDataSource {
-    
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel.screenData.count
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    extension CurrentCityViewController: UITableViewDelegate, UITableViewDataSource {
         
-        let item = viewModel.screenData[indexPath.row]
+        func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+            if viewModel.screenData == nil {
+                return 0
+            } else {
+                return 1
+            }
+        }
         
-        switch item.type {
+        func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+            let cell = tableView.dequeueReusableCell(withIdentifier: Cells.cityCell) as! SearchCityTableViewCell
             
-        case .temperature:
-            guard let safeData = item.data as? Double else {return UITableViewCell()}
-            guard let cell = tableView.dequeueReusableCell(withIdentifier: "CurrentTemperatureCell", for: indexPath) as?
-                CurrentTemperatureTableViewCell else {
-                    fatalError("The dequeued cell is not an instance of CurrentTemperatureCell.")}
-            cell.configure(temperature: safeData)
-            
-            return cell
-            
-        case .description:
-            guard let safeData = item.data as? String else {return UITableViewCell()}
-            guard let cell = tableView.dequeueReusableCell(withIdentifier: "DescriptionCell", for: indexPath) as?
-                DescriptionTableViewCell else {
-                    fatalError("The dequeued cell is not an instance of DescriptionCell.")}
-            cell.configure(description: safeData)
-            
-            return cell
-            
-        case .image:
-            guard let safeData = item.data as? String else {return UITableViewCell()}
-            guard let cell = tableView.dequeueReusableCell(withIdentifier: "ImageCell", for: indexPath) as?
-                ImageTableViewCell else {
-                    fatalError("The dequeued cell is not an instance of ImageCell.")}
-            cell.configure(image: safeData, weather: item)
-            
-            return cell
-            
-        case .name:
-            guard let safeData = item.data as? String else {return UITableViewCell()}
-            guard let cell = tableView.dequeueReusableCell(withIdentifier: "CityNameCell", for: indexPath) as?
-                CityNameTableViewCell else {
-                    fatalError("The dequeued cell is not an instance of CityNameCell.")}
-            cell.configure(name: safeData)
-            
-            return cell
-            
-        case .humidity:
-            guard let safeData = item.data as? Int else {return UITableViewCell()}
-            guard let cell = tableView.dequeueReusableCell(withIdentifier: "HumidityCell", for: indexPath) as?
-                HumidityTableViewCell else {
-                    fatalError("The dequeued cell is not an instance of HumidityCell.")}
-            cell.configure(humidity: safeData)
+            let cityWeather = viewModel.screenData ?? nil
+            cell.configure(cityWeather: cityWeather!)
             
             return cell
         }
     }
-}
+

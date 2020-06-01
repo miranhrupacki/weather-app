@@ -13,11 +13,11 @@ import RxCocoa
 
 class MainViewController: UIViewController {
     
-    let searchButton: UIButton = {
+    let searchBar: UIButton = {
         let search = UIButton()
         search.translatesAutoresizingMaskIntoConstraints = false
         search.backgroundColor = .init(red: 0.45, green: 0.63, blue: 0.95, alpha: 1.00)
-        search.setTitle("Click for hourly weather", for: .normal)
+        search.setTitle("Click for city search", for: .normal)
         search.layer.cornerRadius = 23
         search.titleLabel?.numberOfLines = 0
         search.titleLabel?.adjustsFontSizeToFitWidth = true
@@ -26,123 +26,117 @@ class MainViewController: UIViewController {
         return search
     }()
     
-    let currentWeatherButton: UIButton = {
-        let weather = UIButton()
-        weather.translatesAutoresizingMaskIntoConstraints = false
-        weather.backgroundColor = .init(red: 0.45, green: 0.63, blue: 0.95, alpha: 1.00)
-        weather.layer.cornerRadius = 23
-        weather.titleLabel?.numberOfLines = 0
-        weather.titleLabel?.adjustsFontSizeToFitWidth = true
-        weather.titleLabel?.textAlignment = .center
-        weather.setTitle("Click here for your current city temperature", for: .normal)
-        weather.titleLabel?.font = UIFont.init(name: "Quicksand-Regular", size: 20)
-        return weather
+    var tableView: UITableView = {
+        let tableView = UITableView()
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        tableView.backgroundColor = .init(red: 0.36, green: 0.64, blue: 0.77, alpha: 1.00)
+        return tableView
     }()
-    
-    let mapButton: UIButton = {
-        let map = UIButton()
-        map.translatesAutoresizingMaskIntoConstraints = false
-        map.backgroundColor = .init(red: 0.45, green: 0.63, blue: 0.95, alpha: 1.00)
-        map.layer.cornerRadius = 23
-        map.titleLabel?.numberOfLines = 0
-        map.titleLabel?.adjustsFontSizeToFitWidth = true
-        map.titleLabel?.textAlignment = .center
-        map.setTitle("Click for map screen", for: .normal)
-        map.titleLabel?.font = UIFont.init(name: "Quicksand-Regular", size: 20)
-        return map
-    }()
-    
-    let currentCityButtonSubject = PublishSubject<()>()
-    let hourlyWeatherButtonnSubject = PublishSubject<()>()
-    let mapButtonnSubject = PublishSubject<()>()
+
+    let searchBarSubject = PublishSubject<()>()
     let disposeBag = DisposeBag()
+    var dataSource = [WeatherResponse]()
+    var weatherResponse = WeatherResponse(coord: Coordinates(lon: 45.5550, lat: 18.6955), main: CurrentWeather(temp: 0, humidity: 0), weather: [Weather](), id: 0, name: "Osijek")
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.addSubview(searchButton)
-        view.addSubview(currentWeatherButton)
-        view.addSubview(mapButton)
+        view.addSubview(searchBar)
         view.backgroundColor = .init(red: 0.43, green: 0.45, blue: 0.47, alpha: 1.00)
-        
-        currentWeatherButton.addTarget(self, action: #selector(pushToDefaultCityView), for: .touchUpInside)
-        searchButton.addTarget(self, action: #selector(pushToHourlyWeatherView), for: .touchUpInside)
-        mapButton.addTarget(self, action: #selector(pushToMapView), for: .touchUpInside)
-
-        // Do any additional setup after loading the view.
+        searchBar.addTarget(self, action: #selector(pushToSearchBarView), for: .touchUpInside)
         setupUI()
         setupSubscriptions()
     }
     
-    func setupUI(){
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(true)
+        updateData()
+    }
+    
+    func setupUI() {
+        configureTableView()
         setupConstraints()
     }
     
-    @objc func pushToHourlyWeatherView() {
-         let vc = HourlyViewController()
-         self.navigationController?.pushViewController(vc, animated: true)
-     }
-    
-    @objc func pushToDefaultCityView() {
-        let vc = CurrentCityViewController()
+    @objc func pushToSearchBarView() {
+        let vc = SearchCityViewController()
         self.navigationController?.pushViewController(vc, animated: true)
     }
     
-    @objc func pushToMapView() {
-        let vc = MapViewController()
-        self.navigationController?.pushViewController(vc, animated: true)
-    }
-    
-    func initializeCurrentCitySubject(for subject: PublishSubject<()>) -> Disposable{
+    func initializeSearchBarSubject(for subject: PublishSubject<()>) -> Disposable{
         return subject
-        .subscribeOn(ConcurrentDispatchQueueScheduler(qos: .background))
-        .observeOn(MainScheduler.instance)
-        .subscribe(onNext: { [unowned self] in
-            self.pushToDefaultCityView()
-        })
-    }
-    
-    func initializeHourlyWeatherSubject(for subject: PublishSubject<()>) -> Disposable{
-        return subject
-        .subscribeOn(ConcurrentDispatchQueueScheduler(qos: .background))
-        .observeOn(MainScheduler.instance)
-        .subscribe(onNext: { [unowned self] in
-            self.pushToHourlyWeatherView()
-        })
-    }
-    
-    func initializeMapSubject(for subject: PublishSubject<()>) -> Disposable{
-        return subject
-        .subscribeOn(ConcurrentDispatchQueueScheduler(qos: .background))
-        .observeOn(MainScheduler.instance)
-        .subscribe(onNext: { [unowned self] in
-            self.pushToMapView()
-        })
+            .subscribeOn(ConcurrentDispatchQueueScheduler(qos: .background))
+            .observeOn(MainScheduler.instance)
+            .subscribe(onNext: { [unowned self] in
+                self.pushToSearchBarView()
+            })
     }
     
     func setupSubscriptions() {
-        initializeCurrentCitySubject(for: currentCityButtonSubject).disposed(by: disposeBag)
-        initializeHourlyWeatherSubject(for: hourlyWeatherButtonnSubject).disposed(by: disposeBag)
-        initializeMapSubject(for: mapButtonnSubject).disposed(by: disposeBag)
+        initializeSearchBarSubject(for: searchBarSubject).disposed(by: disposeBag)
     }
     
     func setupConstraints(){
         
-        searchButton.snp.makeConstraints{(maker) in
-            maker.top.equalTo(view.safeAreaLayoutGuide).inset(20)
+        searchBar.snp.makeConstraints{(maker) in
+            maker.top.equalTo(view.safeAreaLayoutGuide)
             maker.leading.trailing.equalTo(view.safeAreaLayoutGuide).inset(50)
-            maker.height.equalTo(150)
+            maker.height.equalTo(50)
         }
         
-        currentWeatherButton.snp.makeConstraints{(maker) in
-            maker.top.equalTo(searchButton.snp.bottom).inset(-50)
-            maker.leading.trailing.equalTo(view.safeAreaLayoutGuide).inset(50)
-            maker.height.equalTo(150)
+        tableView.snp.makeConstraints { (maker) in
+            maker.bottom.trailing.leading.equalToSuperview()
+            maker.top.equalTo(searchBar.snp.bottom)
         }
-        
-        mapButton.snp.makeConstraints{(maker) in
-            maker.top.equalTo(currentWeatherButton.snp.bottom).inset(-50)
-            maker.leading.trailing.equalTo(view.safeAreaLayoutGuide).inset(50)
-            maker.height.equalTo(150)
+    }
+    
+    func setTableViewDelegates() {
+        tableView.delegate = self
+        tableView.dataSource = self
+    }
+    
+    func configureTableView() {
+        view.addSubview(tableView)
+        setTableViewDelegates()
+        tableView.estimatedRowHeight = 180
+        tableView.rowHeight = UITableView.automaticDimension
+        tableView.register(MainViewTableViewCell.self, forCellReuseIdentifier: Cells.mainCell)
+    }
+    
+    func updateData() {
+       dataSource = DatabaseManager.getSearchedCities()
+       tableView.reloadData()
+    }
+}
+
+extension MainViewController: UITableViewDelegate, UITableViewDataSource {
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if dataSource.count == 0 {
+            return 1
+        } else {
+            return dataSource.count
         }
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        var vc: HourlyViewController
+        if dataSource.count == 0 {
+            vc = HourlyViewController(weatherResponse: weatherResponse)
+        } else {
+            vc = HourlyViewController(weatherResponse: dataSource[indexPath.row])
+        }
+        self.navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: Cells.mainCell) as! MainViewTableViewCell
+        if dataSource.count == 0 {
+            cell.configure(cityWeather: "Osijek")
+        } else {
+            var cityWeather = dataSource[indexPath.row]
+            cityWeather.name = (cityWeather.name! as NSString).replacingOccurrences(of: "+", with: " ")
+            cell.configure(cityWeather: cityWeather.name!)
+        }
+        return cell
     }
 }

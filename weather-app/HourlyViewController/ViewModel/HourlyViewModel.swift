@@ -13,6 +13,7 @@ protocol HourlyViewModel {
     
     var dataSource: [HourlyWeatherView] {get}
     var screenData: HourlyWeatherResponse? {get}
+    var weatherResponse: WeatherResponse {get}
     var hourlyWeatherDataStatusObservable: ReplaySubject<(Bool)> {get}
     var loaderSubject: ReplaySubject<Bool> {get}
     var alertObservable: ReplaySubject<()> {get}

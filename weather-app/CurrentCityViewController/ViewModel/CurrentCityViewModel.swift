@@ -10,7 +10,7 @@ import Foundation
 import RxSwift
 
 protocol CurrentCityViewModel {
-    var screenData: [WeatherCellItem] {get}    
+    var screenData: CityByNameView? {get}
     var weatherDataStatusObservable: ReplaySubject<(Bool)> {get}
     var loaderSubject: ReplaySubject<Bool> {get}
     var alertObservable: ReplaySubject<()> {get}

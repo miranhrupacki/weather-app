@@ -1,30 +1,31 @@
 //
-//  HourlyTableViewCell.swift
+//  SearchCityTableViewCell.swift
 //  weather-app
 //
-//  Created by Miran Hrupački on 21/05/2020.
+//  Created by Miran Hrupački on 27/05/2020.
 //  Copyright © 2020 Miran Hrupački. All rights reserved.
 //
 
+import Foundation
 import UIKit
 
-class HourlyTableViewCell: UITableViewCell {
-
-    let hourlyLabel: UILabel = {
-        let movieTitleLabel = UILabel()
-        movieTitleLabel.translatesAutoresizingMaskIntoConstraints = false
-        movieTitleLabel.numberOfLines = 0
-        movieTitleLabel.adjustsFontSizeToFitWidth = true
-        movieTitleLabel.font = UIFont.init(name: "Quicksand-Bold", size: 17)
-        movieTitleLabel.textColor = .black
-        return movieTitleLabel
-    }()
+class SearchCityTableViewCell: UITableViewCell {
     
     let icon: UIImageView = {
         let image = UIImageView ()
         image.translatesAutoresizingMaskIntoConstraints = false
         image.clipsToBounds = true
         return image
+    }()
+    
+    let nameLabel: UILabel = {
+        let name = UILabel()
+        name.translatesAutoresizingMaskIntoConstraints = false
+        name.numberOfLines = 0
+        name.adjustsFontSizeToFitWidth = true
+        name.textColor = .black
+        name.font = UIFont.init(name: "Quicksand-Bold", size: 20)
+        return name
     }()
     
     let temperatureLabel: UILabel = {
@@ -39,9 +40,6 @@ class HourlyTableViewCell: UITableViewCell {
         return temp
     }()
     
-    let date = Date()
-    var dateFormatter = DateFormatter()
-
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?){
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupUI()
@@ -52,36 +50,35 @@ class HourlyTableViewCell: UITableViewCell {
     }
     
     func setupUI(){
+        contentView.addSubview(nameLabel)
         contentView.addSubview(temperatureLabel)
         contentView.addSubview(icon)
-        contentView.addSubview(hourlyLabel)
         contentView.backgroundColor = .init(red: 0.36, green: 0.64, blue: 0.77, alpha: 1.00)
-
+        
         setupConstraints()
     }
     
     func setupConstraints(){
-        temperatureLabel.snp.makeConstraints{(maker) in
-            maker.top.bottom.leading.equalToSuperview().inset(40)
+        
+        nameLabel.snp.makeConstraints{(maker) in
+            maker.top.bottom.leading.equalToSuperview().inset(20)
         }
         
-        hourlyLabel.snp.makeConstraints{(maker) in
+        temperatureLabel.snp.makeConstraints{(maker) in
             maker.top.bottom.equalToSuperview()
-            maker.leading.equalTo(temperatureLabel.snp.trailing).inset(-20)
+            maker.leading.equalTo(nameLabel.snp.trailing).inset(-20)
         }
         
         icon.snp.makeConstraints{(maker) in
             maker.top.bottom.equalToSuperview()
-            maker.leading.equalTo(hourlyLabel.snp.trailing).inset(-20)
+            maker.leading.equalTo(temperatureLabel.snp.trailing).inset(-20)
         }
     }
     
-    func configure(hourlyWeather: HourlyWeatherView){
-        dateFormatter.dateFormat = "HH a"
-        let date = Date(timeIntervalSince1970: Double(hourlyWeather.date))
-        let temperature = (hourlyWeather.temperature - 273.15).rounded()
-        hourlyLabel.text = "\(dateFormatter.string(from: date))"
-        icon.image = UIImage(named: "\(hourlyWeather.image)")
+    func configure(cityWeather: CityByNameView){
+        let temperature = (cityWeather.temperature - 273.15).rounded()
+        icon.image = UIImage(named: "\(cityWeather.image)")
+        nameLabel.text = cityWeather.name
         temperatureLabel.text = "\(temperature)° C"
-       }
+    }
 }

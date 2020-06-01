@@ -11,4 +11,7 @@ import Foundation
 struct Cells{
     static let weatherCell = "WeatherTableViewCell"
     static let hourlyCell = "HourlyTableViewCell"
+    static let cityCell = "SearchCityTableViewCell"
+    static let mainCell = "MainViewTableViewCell"
+
 }
