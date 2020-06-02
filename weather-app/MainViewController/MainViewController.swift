@@ -32,10 +32,9 @@ class MainViewController: UIViewController {
         tableView.backgroundColor = .init(red: 0.36, green: 0.64, blue: 0.77, alpha: 1.00)
         return tableView
     }()
-
-    let searchBarSubject = PublishSubject<()>()
+    
     let disposeBag = DisposeBag()
-    var dataSource = [WeatherResponse]()
+    var viewModel = MainViewControllerViewModelImpl(databaseManager: DatabaseManager(), networkManager: NetworkManager())
     var weatherResponse = WeatherResponse(coord: Coordinates(lon: 45.5550, lat: 18.6955), main: CurrentWeather(temp: 0, humidity: 0), weather: [Weather](), id: 0, name: "Osijek")
     
     override func viewDidLoad() {
@@ -45,11 +44,12 @@ class MainViewController: UIViewController {
         searchBar.addTarget(self, action: #selector(pushToSearchBarView), for: .touchUpInside)
         setupUI()
         setupSubscriptions()
+        initializeDataStatusObservable().disposed(by: disposeBag)
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(true)
-        updateData()
+        viewModel.updateData()
     }
     
     func setupUI() {
@@ -58,8 +58,19 @@ class MainViewController: UIViewController {
     }
     
     @objc func pushToSearchBarView() {
-        let vc = SearchCityViewController()
+        let vc = SearchCityViewController(weatherResponse: weatherResponse)
         self.navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    func initializeDataStatusObservable() -> Disposable {
+        viewModel.cityDataStatusObservable
+            .subscribeOn(ConcurrentDispatchQueueScheduler(qos: .background))
+            .observeOn(MainScheduler.instance)
+            .subscribe(onNext: { [unowned self] (status) in
+                if status {
+                    self.tableView.reloadData()
+                }
+            })
     }
     
     func initializeSearchBarSubject(for subject: PublishSubject<()>) -> Disposable{
@@ -72,17 +83,15 @@ class MainViewController: UIViewController {
     }
     
     func setupSubscriptions() {
-        initializeSearchBarSubject(for: searchBarSubject).disposed(by: disposeBag)
+        initializeSearchBarSubject(for: viewModel.searchBarSubject).disposed(by: disposeBag)
     }
     
     func setupConstraints(){
-        
         searchBar.snp.makeConstraints{(maker) in
             maker.top.equalTo(view.safeAreaLayoutGuide)
             maker.leading.trailing.equalTo(view.safeAreaLayoutGuide).inset(50)
             maker.height.equalTo(50)
         }
-        
         tableView.snp.makeConstraints { (maker) in
             maker.bottom.trailing.leading.equalToSuperview()
             maker.top.equalTo(searchBar.snp.bottom)
@@ -101,39 +110,34 @@ class MainViewController: UIViewController {
         tableView.rowHeight = UITableView.automaticDimension
         tableView.register(MainViewTableViewCell.self, forCellReuseIdentifier: Cells.mainCell)
     }
-    
-    func updateData() {
-       dataSource = DatabaseManager.getSearchedCities()
-       tableView.reloadData()
-    }
 }
 
 extension MainViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if dataSource.count == 0 {
+        if viewModel.dataSource.count == 0 {
             return 1
         } else {
-            return dataSource.count
+            return viewModel.dataSource.count
         }
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         var vc: HourlyViewController
-        if dataSource.count == 0 {
+        if viewModel.dataSource.count == 0 {
             vc = HourlyViewController(weatherResponse: weatherResponse)
         } else {
-            vc = HourlyViewController(weatherResponse: dataSource[indexPath.row])
+            vc = HourlyViewController(weatherResponse: viewModel.dataSource[indexPath.row])
         }
         self.navigationController?.pushViewController(vc, animated: true)
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: Cells.mainCell) as! MainViewTableViewCell
-        if dataSource.count == 0 {
+        if viewModel.dataSource.count == 0 {
             cell.configure(cityWeather: "Osijek")
         } else {
-            var cityWeather = dataSource[indexPath.row]
+            var cityWeather = viewModel.dataSource[indexPath.row]
             cityWeather.name = (cityWeather.name! as NSString).replacingOccurrences(of: "+", with: " ")
             cell.configure(cityWeather: cityWeather.name!)
         }

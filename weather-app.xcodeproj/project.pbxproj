@@ -42,7 +42,10 @@
 		F1C24AB1247F99BA00D2F268 /* UserInteraction.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1C24AB0247F99BA00D2F268 /* UserInteraction.swift */; };
 		F1C24AB52480FC1500D2F268 /* MainViewTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1C24AB42480FC1500D2F268 /* MainViewTableViewCell.swift */; };
 		F1C24AB724852AF200D2F268 /* HourlyWeatherHeaderCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1C24AB624852AF200D2F268 /* HourlyWeatherHeaderCell.swift */; };
-		F1E7929B24781417000EE686 /* MapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1E7929A24781417000EE686 /* MapViewController.swift */; };
+		F1C24ABA248542C200D2F268 /* MainViewControllerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1C24AB9248542C200D2F268 /* MainViewControllerViewModel.swift */; };
+		F1C24ABC248542D300D2F268 /* MainViewControllerViewModelImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1C24ABB248542D300D2F268 /* MainViewControllerViewModelImpl.swift */; };
+		F1C24ABF2485647C00D2F268 /* SearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1C24ABE2485647C00D2F268 /* SearchViewModel.swift */; };
+		F1C24AC12485648800D2F268 /* SearchViewModelImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1C24AC02485648800D2F268 /* SearchViewModelImpl.swift */; };
 		F1E7929E2478259F000EE686 /* CurrentCityViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1E7929D2478259F000EE686 /* CurrentCityViewModel.swift */; };
 		F1E792A0247826DB000EE686 /* CurrentCityViewModelImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1E7929F247826DB000EE686 /* CurrentCityViewModelImpl.swift */; };
 		F1E792A224783B99000EE686 /* CellIds.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1E792A124783B99000EE686 /* CellIds.swift */; };
@@ -89,7 +92,10 @@
 		F1C24AB0247F99BA00D2F268 /* UserInteraction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserInteraction.swift; sourceTree = "<group>"; };
 		F1C24AB42480FC1500D2F268 /* MainViewTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewTableViewCell.swift; sourceTree = "<group>"; };
 		F1C24AB624852AF200D2F268 /* HourlyWeatherHeaderCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HourlyWeatherHeaderCell.swift; sourceTree = "<group>"; };
-		F1E7929A24781417000EE686 /* MapViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewController.swift; sourceTree = "<group>"; };
+		F1C24AB9248542C200D2F268 /* MainViewControllerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewControllerViewModel.swift; sourceTree = "<group>"; };
+		F1C24ABB248542D300D2F268 /* MainViewControllerViewModelImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewControllerViewModelImpl.swift; sourceTree = "<group>"; };
+		F1C24ABE2485647C00D2F268 /* SearchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewModel.swift; sourceTree = "<group>"; };
+		F1C24AC02485648800D2F268 /* SearchViewModelImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewModelImpl.swift; sourceTree = "<group>"; };
 		F1E7929D2478259F000EE686 /* CurrentCityViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentCityViewModel.swift; sourceTree = "<group>"; };
 		F1E7929F247826DB000EE686 /* CurrentCityViewModelImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentCityViewModelImpl.swift; sourceTree = "<group>"; };
 		F1E792A124783B99000EE686 /* CellIds.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CellIds.swift; sourceTree = "<group>"; };
@@ -210,7 +216,6 @@
 				F10B08972476960400E53EED /* HourlyViewController */,
 				F18ED3822473EFEB008736B8 /* CurrentCityViewController */,
 				F18ED3A32474101C008736B8 /* MainViewController */,
-				F1E79299247813F6000EE686 /* MapViewController */,
 				F1A8B093247D6FEC00A3DDA1 /* SearchViewController */,
 				F18ED3802473EFD3008736B8 /* Delegate */,
 				F18ED3722473EF2C008736B8 /* Main.storyboard */,
@@ -300,6 +305,7 @@
 		F18ED3A32474101C008736B8 /* MainViewController */ = {
 			isa = PBXGroup;
 			children = (
+				F1C24AB8248542A800D2F268 /* ViewModel */,
 				F1C24AB22480FBF600D2F268 /* UI */,
 				F18ED3A424741051008736B8 /* MainViewController.swift */,
 			);
@@ -309,6 +315,7 @@
 		F1A8B093247D6FEC00A3DDA1 /* SearchViewController */ = {
 			isa = PBXGroup;
 			children = (
+				F1C24ABD2485646800D2F268 /* ViewModel */,
 				F1A8B09B247E6EB800A3DDA1 /* UI */,
 				F1A8B094247D700800A3DDA1 /* SearchCityViewController.swift */,
 			);
@@ -356,6 +363,24 @@
 			path = Cells;
 			sourceTree = "<group>";
 		};
+		F1C24AB8248542A800D2F268 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				F1C24AB9248542C200D2F268 /* MainViewControllerViewModel.swift */,
+				F1C24ABB248542D300D2F268 /* MainViewControllerViewModelImpl.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		F1C24ABD2485646800D2F268 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				F1C24ABE2485647C00D2F268 /* SearchViewModel.swift */,
+				F1C24AC02485648800D2F268 /* SearchViewModelImpl.swift */,
+			);
+			path = ViewModel;
+			sourceTree = "<group>";
+		};
 		F1E7929824780E96000EE686 /* CurrentCityModels */ = {
 			isa = PBXGroup;
 			children = (
@@ -365,14 +390,6 @@
 				F18ED3A12474079B008736B8 /* WeatherCellItem.swift */,
 			);
 			path = CurrentCityModels;
-			sourceTree = "<group>";
-		};
-		F1E79299247813F6000EE686 /* MapViewController */ = {
-			isa = PBXGroup;
-			children = (
-				F1E7929A24781417000EE686 /* MapViewController.swift */,
-			);
-			path = MapViewController;
 			sourceTree = "<group>";
 		};
 		F1E7929C2478258F000EE686 /* ViewModel */ = {
@@ -513,12 +530,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				F18ED3912473F35E008736B8 /* NetworkManager.swift in Sources */,
+				F1C24ABF2485647C00D2F268 /* SearchViewModel.swift in Sources */,
 				F10B90192475694800292BED /* DescriptionTableViewCell.swift in Sources */,
 				F1C24AB724852AF200D2F268 /* HourlyWeatherHeaderCell.swift in Sources */,
 				F1C24AAF247F988800D2F268 /* DatabaseManager.swift in Sources */,
 				F1A8B098247E5AB500A3DDA1 /* CityByNameResponse.swift in Sources */,
 				F18ED3A22474079B008736B8 /* WeatherCellItem.swift in Sources */,
-				F1E7929B24781417000EE686 /* MapViewController.swift in Sources */,
 				F18ED38C2473F1F2008736B8 /* WeatherView.swift in Sources */,
 				F18ED3932473F368008736B8 /* SerializationManager.swift in Sources */,
 				F10B089B2476962F00E53EED /* HourlyTableViewCell.swift in Sources */,
@@ -527,16 +544,19 @@
 				F10B90262475796E00292BED /* HumidityTableViewCell.swift in Sources */,
 				F18ED39C24740600008736B8 /* CurrentTemperatureTableViewCell.swift in Sources */,
 				F1E792A0247826DB000EE686 /* CurrentCityViewModelImpl.swift in Sources */,
+				F1C24ABC248542D300D2F268 /* MainViewControllerViewModelImpl.swift in Sources */,
 				F18ED3A02474076C008736B8 /* WeatherDataTypeEnum.swift in Sources */,
 				F18ED3A524741051008736B8 /* MainViewController.swift in Sources */,
 				F10B08A02476986200E53EED /* HourlyWeatherResponse.swift in Sources */,
 				F10B08A224769AA700E53EED /* HourlyWeatherView.swift in Sources */,
+				F1C24AC12485648800D2F268 /* SearchViewModelImpl.swift in Sources */,
 				F1E7929E2478259F000EE686 /* CurrentCityViewModel.swift in Sources */,
 				F18ED3962473F6E4008736B8 /* UIViewControllerExtension.swift in Sources */,
 				F1C24AB1247F99BA00D2F268 /* UserInteraction.swift in Sources */,
 				F18ED3712473EF2C008736B8 /* CurrentCityViewController.swift in Sources */,
 				F18ED39A247405EA008736B8 /* CityNameTableViewCell.swift in Sources */,
 				F1A8B095247D700800A3DDA1 /* SearchCityViewController.swift in Sources */,
+				F1C24ABA248542C200D2F268 /* MainViewControllerViewModel.swift in Sources */,
 				F1E792A224783B99000EE686 /* CellIds.swift in Sources */,
 				F1C24AB52480FC1500D2F268 /* MainViewTableViewCell.swift in Sources */,
 				F18ED39E24740616008736B8 /* ImageTableViewCell.swift in Sources */,

@@ -43,7 +43,7 @@ class CurrentCityViewController: UIViewController{
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
+    
     private func initializeAlertObservable() -> Disposable{
         viewModel.alertObservable
             .observeOn(MainScheduler.instance)
@@ -82,49 +82,49 @@ class CurrentCityViewController: UIViewController{
                 } 
             })
     }
-        
-        func setupUI() {
-            configureTableView()
-            setupConstraints()
-        }
-        
-        func configureTableView() {
-            view.addSubview(tableView)
-            setTableViewDelegates()
-            tableView.estimatedRowHeight = 180
-            tableView.rowHeight = UITableView.automaticDimension
-            tableView.register(SearchCityTableViewCell.self, forCellReuseIdentifier: Cells.cityCell)
-        }
-        
-        func setupConstraints(){
-            tableView.snp.makeConstraints { (maker) in
-                maker.bottom.trailing.leading.top.equalToSuperview()
-            }
-        }
-        
-        func setTableViewDelegates() {
-            tableView.delegate = self
-            tableView.dataSource = self
+    
+    func setupUI() {
+        configureTableView()
+        setupConstraints()
+    }
+    
+    func configureTableView() {
+        view.addSubview(tableView)
+        setTableViewDelegates()
+        tableView.estimatedRowHeight = 180
+        tableView.rowHeight = UITableView.automaticDimension
+        tableView.register(SearchCityTableViewCell.self, forCellReuseIdentifier: Cells.cityCell)
+    }
+    
+    func setupConstraints(){
+        tableView.snp.makeConstraints { (maker) in
+            maker.bottom.trailing.leading.top.equalToSuperview()
         }
     }
+    
+    func setTableViewDelegates() {
+        tableView.delegate = self
+        tableView.dataSource = self
+    }
+}
 
-    extension CurrentCityViewController: UITableViewDelegate, UITableViewDataSource {
-        
-        func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-            if viewModel.screenData == nil {
-                return 0
-            } else {
-                return 1
-            }
-        }
-        
-        func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-            let cell = tableView.dequeueReusableCell(withIdentifier: Cells.cityCell) as! SearchCityTableViewCell
-            
-            let cityWeather = viewModel.screenData ?? nil
-            cell.configure(cityWeather: cityWeather!)
-            
-            return cell
+extension CurrentCityViewController: UITableViewDelegate, UITableViewDataSource {
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if viewModel.screenData == nil {
+            return 0
+        } else {
+            return 1
         }
     }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: Cells.cityCell) as! SearchCityTableViewCell
+        
+        let cityWeather = viewModel.screenData ?? nil
+        cell.configure(cityWeather: cityWeather!)
+        
+        return cell
+    }
+}
 

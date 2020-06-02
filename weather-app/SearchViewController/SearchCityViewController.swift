@@ -26,23 +26,32 @@ class SearchCityViewController: UIViewController, UISearchBarDelegate {
         return search
     }()
     
-    var dataSource: CityByNameView?
-    var screenData: WeatherResponse?
+    let viewModel: SearchViewModel
     let disposeBag = DisposeBag()
     let loaderIndicator = UIActivityIndicatorView(style: UIActivityIndicatorView.Style.large)
-    let networkManager = NetworkManager()
     let data = CurrentCityViewModelImpl(networkManager: NetworkManager(), weatherResponse: WeatherResponse(coord: Coordinates(lon: 45.5550, lat: 18.6955), main: CurrentWeather(temp: 0, humidity: 0), weather: [Weather](), id: 0, name: "Osijek"))
-    let citySearchReplaySubject = ReplaySubject<()>.create(bufferSize: 1)
     var city = "London"
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         view.addSubview(searchBar)
-
         setupUI()
         setSearchBarDelegate()
-        citySearchReplaySubject.onNext(())
+        viewModel.loadData()
+        viewModel.initializeLoadDataSubject().disposed(by: disposeBag)
+        initializeLoaderObservable().disposed(by: disposeBag)
+        initializeAlertObservable().disposed(by: disposeBag)
+        initializeDataStatusObservable().disposed(by: disposeBag)
+        viewModel.citySearchButtonReplaySubject.disposed(by: disposeBag)
+    }
+    
+    init(weatherResponse: WeatherResponse) {
+        viewModel = SearchViewModelImpl(networkManager: NetworkManager(), weatherResponse: weatherResponse)
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     func setSearchBarDelegate() {
@@ -51,41 +60,46 @@ class SearchCityViewController: UIViewController, UISearchBarDelegate {
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         city = (self.searchBar.text! as NSString).replacingOccurrences(of: " ", with: "+")
-        showData(for: citySearchReplaySubject).disposed(by: disposeBag)
+        viewModel.searchCityObservable.onNext((city))
+    }
+
+    private func initializeAlertObservable() -> Disposable{
+        viewModel.alertObservable
+            .observeOn(MainScheduler.instance)
+            .subscribeOn(ConcurrentDispatchQueueScheduler(qos: .background))
+            .subscribe(onNext: { [unowned self] type in
+                self.showAlertWith(title: "Weather network error", message: "Weather couldn't load")
+                }
+        )
     }
     
-    func showData(for subject: ReplaySubject<()>) -> Disposable {
-        return subject
-            .flatMap { [unowned self] (_) -> Observable<WeatherResponse> in
-                DispatchQueue.main.async {
-                    self.loaderIndicator.startAnimating()
-                }
-                return self.networkManager.getCityByName(url: "https://api.openweathermap.org/data/2.5/weather?q=\(self.city)")
+    private func initializeLoaderObservable() -> Disposable{
+        viewModel.loaderSubject
+            .observeOn(MainScheduler.instance)
+            .subscribeOn(ConcurrentDispatchQueueScheduler(qos: .background))
+            .subscribe(onNext:{ [unowned self] status in
+                self.checkLoaderStatus(status: status)
+            })
+    }
+    
+    private func checkLoaderStatus(status: Bool){
+        if status{
+            self.loaderIndicator.startAnimating()
         }
-        .map{ (data) in
-            return self.createScreenData(data: data)
+        else{
+            self.loaderIndicator.stopAnimating()
         }
-        .subscribeOn(ConcurrentDispatchQueueScheduler(qos: .background))
-        .observeOn(MainScheduler.instance)
-        .subscribe(
-            onNext: { [unowned self](weatherList) in
-                self.dataSource = weatherList
-                DispatchQueue.main.async {
-                    self.loaderIndicator.stopAnimating()
+    }
+    
+    func initializeDataStatusObservable() -> Disposable {
+        viewModel.searchDataStatusObservable
+            .subscribeOn(ConcurrentDispatchQueueScheduler(qos: .background))
+            .observeOn(MainScheduler.instance)
+            .subscribe(onNext: { [unowned self] (status) in
+                if status {
                     self.tableView.reloadData()
                 }
-            }, onError: { [unowned self]error in
-                self.showAlertWith(title: "Search city weather network error", message: "City weather couldn't load")
-        })
-    }
-    
-    private func createScreenData(data: WeatherResponse) -> (CityByNameView){
-        if !DatabaseManager.isCitySearched(with: self.city) {
-            DatabaseManager.searchedCity(with: data)
-        }
-        screenData = data
-        let searched = DatabaseManager.isCitySearched(with: data.name!)
-        return CityByNameView(id: data.id, name: data.name ?? "abc", temperature: data.main.temp , image: data.weather[0].icon, searched: searched )
+            })
     }
     
     func setupUI() {
@@ -119,9 +133,8 @@ class SearchCityViewController: UIViewController, UISearchBarDelegate {
 }
 
 extension SearchCityViewController: UITableViewDelegate, UITableViewDataSource {
-    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if dataSource == nil {
+        if viewModel.dataSource == nil {
             return 0
         } else {
             return 1
@@ -131,7 +144,7 @@ extension SearchCityViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: Cells.cityCell) as! SearchCityTableViewCell
         
-        let cityWeather = dataSource ?? nil
+        let cityWeather = viewModel.dataSource ?? nil
         cell.configure(cityWeather: cityWeather!)
         
         return cell
